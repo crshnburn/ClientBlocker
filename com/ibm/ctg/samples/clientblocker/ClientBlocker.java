@@ -26,13 +26,13 @@ public class ClientBlocker implements CICSRequestExit {
    /**
     * List of IP addresses that are allowed to call CICS programs
     */
-   private List<String> whiteList = Arrays.asList("127.0.0.1");
+   private List<String> allowList = Arrays.asList("127.0.0.1");
 
    @Override
    public String getCICSServer(Map<RequestDetails, Object> details) throws InvalidRequestException {
       String server = details.get(RequestDetails.Server).toString();
       String clientIP = ((InetAddress) details.get(RequestDetails.ClientLocation)).getHostAddress();
-      if (!whiteList.contains(clientIP)) {
+      if (!allowList.contains(clientIP)) {
          throw new InvalidRequestException("Client not allowed to call CICS");
       }
       return server;
@@ -55,23 +55,23 @@ public class ClientBlocker implements CICSRequestExit {
             //Create a new list with the supplied IP address added and set it as the
             //current list
             if (location > 0) {
-               ArrayList<String> newWhiteList = new ArrayList<String>(whiteList);
-               newWhiteList.add(commandData.substring(location + 1));
-               whiteList = newWhiteList;
+               ArrayList<String> newAllowList = new ArrayList<String>(allowList);
+               newAllowList.add(commandData.substring(location + 1));
+               allowList = newAllowList;
             }
          } else if (commandData.startsWith("DEL")) {
             int location = commandData.indexOf("=");
             //Create a new list with the supplied IP address removed and set it
             //as the current list
             if (location > 0) {
-               ArrayList<String> newWhiteList = new ArrayList<String>(whiteList);
-               newWhiteList.remove(commandData.substring(location + 1));
-               whiteList = newWhiteList;
+               ArrayList<String> newAllowList = new ArrayList<String>(allowList);
+               newAllowList.remove(commandData.substring(location + 1));
+               allowList = newAllowList;
             }
          } else if (commandData.startsWith("LIST")) {
             //Write the list of allowed IP addresses to the standard output stream
             StringBuffer list = new StringBuffer("Allowed IP addresses:");
-            for (String ip : whiteList) {
+            for (String ip : allowList) {
                list.append("\n\t");
                list.append(ip);
             }
